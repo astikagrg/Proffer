@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>Logout</title>
+{% endblock head %}
+
+{% block content %}
+<div class="alert alert-success" role="alert">
+    You have been successfully logged out.
+</div>
+<a class="btn btn-primary" href="javascript:history.back()" role="button">Return to the previous page</a>
+
+{% endblock content %}

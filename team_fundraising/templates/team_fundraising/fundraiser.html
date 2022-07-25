@@ -1,0 +1,95 @@
+
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block head %}
+<title>{{ fundraiser.name }}'s Fundraising Page </title>
+<meta property="og:url"         content="{{ request.build_absolute_uri }}" />
+<meta property="og:title"       content="Triple Crown for Heart Fundraising" />
+<meta property="og:description" content="I'm fundraising for the Triple Crown for Heart, raising money for the BC Children's Hospital and the Children's Heart Network." />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://{{ request.META.HTTP_HOST }}{% static "nophoto.png" %}" />
+<meta property="fb:app_id" content="903165813185691" />
+
+{% endblock head %}
+
+{% block content %}
+{% for message in messages %}
+
+    <div class="alert alert-primary" role="alert">
+        {{ message }}
+    </div>
+
+    {% endfor %}
+    <br/>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                {% if fundraiser.photo %}
+                    <img src="{{ fundraiser.photo.url }}" width="200" height="200" class="circle-image">
+                {% else %}
+                    <img  src="{% static "nophoto.png" %}" alt="Card image cap" width="200" height="200" class="circle-image">
+                {% endif %}
+
+                <h2>{{ fundraiser.name }}</h2>
+            </div>
+            <div class="col-lg-6">
+
+                <div id="countdown-wrap">
+                <div id="goal-stat">
+                    <div id="raised"><strong>${{ fundraiser.total_raised|floatformat:"0"|intcomma }}</strong></div>
+                    <div id="goal">Goal: ${{ fundraiser.goal|floatformat:"0"|intcomma }}</div>
+                </div>
+                <div id="glass">
+                    <div id="progress">
+                    </div>
+                </div>
+                <div class="goal-stat">
+                    <span class="goal-number">{{ fundraiser.percent_raised|floatformat:"0" }}%</span>
+                </div>
+                </div>
+                <script>
+                    document.getElementById("progress").style.width = "{{ fundraiser.percent_raised }}%";
+                </script>
+
+                <!--http://stackoverflow.com/questions/9335140/how-to-countdown-to-a-date -->
+
+                
+                <a class="btn btn-primary donate-button" href="{% url 'team_fundraising:donation' fundraiser.id %}" role="button">Donate</a>
+                <br/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <br/>
+                {{ fundraiser.message|safe }}
+                {% if user.is_authenticated and user.id == fundraiser.user.id  %}
+                    <br/>
+                    <a class="btn btn-secondary" href="{% url 'team_fundraising:update_fundraiser' fundraiser.campaign.id %}" role="button">Edit</a>  
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                <h4>Recent Donations</h4>
+                {{ fundraiser.Donation }}
+                <ul>
+                    {% for donation in donations %}
+                    <li>
+                            {% if  donation.anonymous %}
+                                Anonymous
+                            {% else %}
+                                {{ donation.name }}
+                            {% endif %}
+                            - ${{ donation.amount|floatformat:"2"|intcomma }} 
+                            {% if donation.message %}
+                            - {{ donation.message }}
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+   {% endblock %}
